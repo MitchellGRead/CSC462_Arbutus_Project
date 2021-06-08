@@ -16,8 +16,8 @@ from sentinelhub import MimeType, CRS, BBox, SentinelHubRequest, SentinelHubDown
 from utils import plot_image
 
 # Bounding Box coords for areas of interest
-vancouver_bbox_cords=[46.16, -16.15, 46.51, -15.58] #as in example
-#vancouver_bbox_cords = [-123.31, 49.00, -122.18, 49.38] #actual van coords
+# vancouver_bbox_cords=[46.16, -16.15, 46.51, -15.58] #as in example
+vancouver_bbox_cords = [-123.31, 49.00, -122.18, 49.38] #actual van coords
 vancouver_resolution = 60
 vancouver_bbox = BBox(bbox=vancouver_bbox_cords, crs=CRS.WGS84)
 vancouver_size = bbox_to_dimensions(vancouver_bbox, resolution=vancouver_resolution)
@@ -50,18 +50,20 @@ def main():
 	config = SHConfig()
 
 	config.instance_id='d6a7dc2f-2fbb-4786-a6cf-91a5e10e249a'
-	config.client_id='91439487-66bd-4f7a-a6ad-29895c311a51'
-	config.client_secret='U&5::8|HL%_SY&KOObGV&>s|6i&BR_QtdnW.E8]W'
+	config.sh_client_id='91439487-66bd-4f7a-a6ad-29895c311a51'
+	config.sh_client_secret='U&5::8|HL%_SY&KOObGV&>s|6i&BR_QtdnW.E8]W'
 
 	config.save()
 
+	from_date = '2020-06-04'
+	to_date = from_date
 
 	request_true_color = SentinelHubRequest(
 		evalscript=evalscript_color,
 		input_data=[
 			SentinelHubRequest.input_data(
 				data_collection=DataCollection.SENTINEL2_L1C,
-				time_interval=('2020-07-12', '2020-07-12'),
+				time_interval=(from_date, to_date),
 			)
 		],
 		responses=[
@@ -76,7 +78,7 @@ def main():
 	image = images[0]
 
 	im = Image.fromarray(image)
-	im.save('van.jpeg')
+	im.save('./images/van.jpeg')
 
 	#png.from_array(image).save('van.png')
 	#plot_image(image, factor=3.5/255, clip_range=(0,1))
