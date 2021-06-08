@@ -4,17 +4,17 @@ import json
 import requests
 
 def main():
-        # Your client credentials
-        client_id = 'f2dc92d4-bb01-4c0c-a727-6324293aff6e'
-        client_secret = '1.c!>md*8<g%>17a-J2oiP|m9h:7x#^s!)!6Tj|Z'
+	# Your client credentials
+	client_id = 'f2dc92d4-bb01-4c0c-a727-6324293aff6e'
+	client_secret = '1.c!>md*8<g%>17a-J2oiP|m9h:7x#^s!)!6Tj|Z'
 
-        # Create a session
-        client = BackendApplicationClient(client_id=client_id)
-        oauth = OAuth2Session(client=client)
+	# Create a session
+	client = BackendApplicationClient(client_id=client_id)
+	oauth = OAuth2Session(client=client)
 
-        # Get token for the session
-        token = oauth.fetch_token(token_url='https://services.sentinel-hub.com/oauth/token',
-		client_id=client_id, client_secret=client_secret)
+	# Get token for the session
+	token = oauth.fetch_token(token_url='https://services.sentinel-hub.com/oauth/token',
+	client_id=client_id, client_secret=client_secret)
 
 	response = requests.post('https://services.sentinel-hub.com/api/v1/process',
 	headers={"Authorization" : f"Bearer {token['access_token']}"},
