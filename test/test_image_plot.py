@@ -6,6 +6,8 @@ import os
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import png
+from PIL import Image
 
 from sentinelhub import SHConfig
 from sentinelhub import MimeType, CRS, BBox, SentinelHubRequest, SentinelHubDownloadClient, \
@@ -14,13 +16,16 @@ from sentinelhub import MimeType, CRS, BBox, SentinelHubRequest, SentinelHubDown
 from utils import plot_image
 
 # Bounding Box coords for areas of interest
-vancouver_bbox_cords = [-123.314506,49.007619,-122.189780,49.383633]
+vancouver_bbox_cords=[46.16, -16.15, 46.51, -15.58] #as in example
+#vancouver_bbox_cords = [-123.31, 49.00, -122.18, 49.38] #actual van coords
 vancouver_resolution = 60
 vancouver_bbox = BBox(bbox=vancouver_bbox_cords, crs=CRS.WGS84)
 vancouver_size = bbox_to_dimensions(vancouver_bbox, resolution=vancouver_resolution)
 
 
 kamloops_bbox = [-120.623619,50.626084,-120.124174,50.807054]
+
+
 okanagan_bbox = [-119.887128,49.003343,-119.308973,49.224471]
 
 evalscript_color = """
@@ -36,7 +41,7 @@ evalscript_color = """
 			}
 
 		function evaluatePixel(sample) {
-			return [sample.B04, sample.B03, sample.B02];
+			return [2.5*sample.B04, 2.5*sample.B03, 2.5*sample.B02];
 		}
 """
 
@@ -56,7 +61,7 @@ def main():
 		input_data=[
 			SentinelHubRequest.input_data(
 				data_collection=DataCollection.SENTINEL2_L1C,
-				time_interval=('2020-06-12', '2020-06-13'),
+				time_interval=('2020-07-12', '2020-07-12'),
 			)
 		],
 		responses=[
@@ -69,7 +74,12 @@ def main():
 	
 	images = request_true_color.get_data()
 	image = images[0]
-	plot_image(image, factor=3.5/255, clip_range=(0,1))
+
+	im = Image.fromarray(image)
+	im.save('van.jpeg')
+
+	#png.from_array(image).save('van.png')
+	#plot_image(image, factor=3.5/255, clip_range=(0,1))
 
 
 if __name__ == '__main__':
