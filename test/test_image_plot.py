@@ -1,19 +1,6 @@
-from oauthlib.oauth2 import BackendApplicationClient
-from requests_oauthlib import OAuth2Session
-import json
-import requests
-import os
-import datetime
-import numpy as np
-import matplotlib.pyplot as plt
-import png
 from PIL import Image
-
+from sentinelhub import MimeType, CRS, BBox, SentinelHubRequest, DataCollection, bbox_to_dimensions
 from sentinelhub import SHConfig
-from sentinelhub import MimeType, CRS, BBox, SentinelHubRequest, SentinelHubDownloadClient, \
-	DataCollection, bbox_to_dimensions, DownloadRequest
-
-from utils import plot_image
 
 # Bounding Box coords for areas of interest
 # vancouver_bbox_cords=[46.16, -16.15, 46.51, -15.58] #as in example
