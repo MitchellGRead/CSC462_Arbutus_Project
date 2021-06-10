@@ -18,7 +18,7 @@ def fetch_data():
 	""" Fetch satellite data """
 	args = get_args()
 
-	cords = location_to_cords(args.location)
+	cords = getattr(constants, args.location)
 	bbox = BBox(bbox=cords, crs=CRS.WGS84)
 
 	config = SHConfig()
@@ -31,7 +31,7 @@ def fetch_data():
 
 	# TODO: bust up time interval into months and make separate requests
 	request = SentinelHubRequest(
-		evalscript=args.evalscript,
+		evalscript=getattr(constants, args.evalscript),
 		input_data=[
 			SentinelHubRequest.input_data(
 				data_collection=DataCollection.SENTINEL2_L1C,
@@ -49,7 +49,7 @@ def fetch_data():
 	images = request.get_data()
 	for idx, image in enumerate(images):
 		im = Image.fromarray(image)
-		im.save(f"../../satellite_data/{args.location}-{idx}.{args.mime.lower()}")
+		im.save(f"../../satellite_data/{args.location}-{args.evalscript}-{idx}.{args.mime.lower()}")
 
 def get_args():
 	""" Configure and fetch script args """
@@ -57,7 +57,7 @@ def get_args():
 
 	parser.add_argument(
 		"--location",
-		choices=["vancouver", "kamloops", "okanagan", "ex"],
+		choices=["VAN", "KAMLOOPS", "OKANAGAN", "EX"],
 		required=True
 	)
 	parser.add_argument(
@@ -79,19 +79,13 @@ def get_args():
 		],
 		required=True
 	)
-	parser.add_argument("--evalscript", default=constants.EVALSCRIPT_COLOUR)
+	parser.add_argument(
+		"--evalscript",
+		choices=["NDVI", "AFVI", "COLOUR"],
+		default="COLOUR"
+	)
 
 	return parser.parse_args()
-
-def location_to_cords(location):
-	if location == "vancouver":
-		return constants.CORDS_VAN
-	if location == "kamloops":
-		return constants.CORDS_KAMLOOPS
-	if location == "okanagan":
-		return constants.CORDS_OKANAGAN
-
-	return constants.CORDS_EX
 
 if __name__ == "__main__":
 	fetch_data()
