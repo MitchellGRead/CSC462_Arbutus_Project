@@ -29,6 +29,7 @@ def fetch_data():
 
 	config.save()
 
+	# TODO: bust up time interval into months and make separate requests
 	request = SentinelHubRequest(
 		evalscript=args.evalscript,
 		input_data=[
