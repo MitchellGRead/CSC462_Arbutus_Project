@@ -29,7 +29,7 @@ def call_server():
 		print(f"[ERR] Could not load {args.dataset} with path: {filename}.")
 		return
 
-	coords = geopandas.read_file(os.path.join(here, f'datasets/{args.coords}.json'))
+	coords = geopandas.read_file(os.path.join(here, f'datasets/{args.bbox}.json'))
 
 	# add noise if desired
 	if args.noise > 0:
@@ -61,7 +61,7 @@ def call_server():
 	# call server
 	url = "http://127.0.0.1:5000/plot/heatmap"
 	files = {
-		"coords": ("coords.json", open(f'datasets/{args.coords}.json', "rb"), "application/json"),
+		"coords": ("coords.json", open(f'datasets/{args.bbox}.json', "rb"), "application/json"),
 		"heatmap": ("heatmap.tiff", open("temp.tiff", "rb"), "image/tiff")
 	}
 

@@ -28,7 +28,11 @@ def fetch_sentinel_data(kwargs=None, return_image=True):
 	to_date = str(args.get("to_date"))
 	mime = args.get("mime", "TIFF")
 
-	bbox_points = coords_to_bbox(args.get("coords"))
+	if hasattr(args, "location"):
+		bbox_points = getattr(constants, args.location)
+	else:
+		bbox_points = coords_to_bbox(args.get("coords"))
+
 	bbox = BBox(bbox=bbox_points, crs=CRS.WGS84)
 
 	config = SHConfig()
