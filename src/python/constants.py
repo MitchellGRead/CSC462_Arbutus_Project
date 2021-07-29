@@ -17,6 +17,23 @@ function evaluatePixel(sample) {
 }
 """
 
+REDANDNIR = """
+//VERSION=3
+
+function setup() {
+	return {
+		input: ["B04", "B08"],
+		output: {
+			bands: 2
+		}
+	};
+}
+
+function evaluatePixel(sample) {
+	return [sample.B04, sample.B08];
+}
+"""
+
 AFVI = """
 //VERSION=3
 // Aerosol free vegetation index 1600  (abbrv. AFRI1600)
