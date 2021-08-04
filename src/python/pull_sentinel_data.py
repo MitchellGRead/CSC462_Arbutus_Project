@@ -14,12 +14,26 @@ from PIL import Image
 
 import constants
 
-def fetch_data():
-	""" Fetch satellite data """
-	args = get_args()
+def fetch_sentinel_data(kwargs=None, return_image=True):
+	""" 
+	Fetch satellite data.
+	If 'kwargs' is None the arguments will be fetched via arg parsing.
+	If 'return_image' is True the fetched image will be returned to the caller.
+	Otherwise, the image will be saved locally.
+	"""
+	args = get_args() if not kwargs else kwargs
 
-	cords = getattr(constants, args.location)
-	bbox = BBox(bbox=cords, crs=CRS.WGS84)
+	evalscript = args.get("evalscript", "COLOUR")
+	from_date = str(args.get("from_date"))
+	to_date = str(args.get("to_date"))
+	mime = args.get("mime", "TIFF")
+
+	if hasattr(args, "location"):
+		bbox_points = getattr(constants, args.location)
+	else:
+		bbox_points = coords_to_bbox(args.get("coords"))
+
+	bbox = BBox(bbox=bbox_points, crs=CRS.WGS84)
 
 	config = SHConfig()
 
@@ -31,15 +45,15 @@ def fetch_data():
 
 	# TODO: bust up time interval into months and make separate requests
 	request = SentinelHubRequest(
-		evalscript=getattr(constants, args.evalscript),
+		evalscript=getattr(constants, evalscript),
 		input_data=[
 			SentinelHubRequest.input_data(
 				data_collection=DataCollection.SENTINEL2_L1C,
-				time_interval=(str(args.from_date), str(args.to_date)),
+				time_interval=(from_date, to_date),
 			)
 		],
 		responses=[
-			SentinelHubRequest.output_response('default', getattr(MimeType, args.mime))
+			SentinelHubRequest.output_response('default', getattr(MimeType, mime))
 		],
 		bbox=bbox,
 		size=bbox_to_dimensions(bbox, resolution=constants.RESOLUTION),
@@ -49,7 +63,23 @@ def fetch_data():
 	images = request.get_data()
 	for idx, image in enumerate(images):
 		im = Image.fromarray(image)
+		
+		if return_image:
+			return im
+
 		im.save(f"../../satellite_data/{args.location}-{args.evalscript}-{idx}.{args.mime.lower()}")
+
+def coords_to_bbox(coords):
+	# order is min(lat), min(long), max(lat), max(long)
+	min_lat, min_long, max_lat, max_long = 90, 180, -90, -180
+	for coords in coords["features"][0]["geometry"]["coordinates"][0]:
+		lng, lat = coords
+		min_lat = min(lat, min_lat)
+		min_long = min(lng, min_long)
+		max_lat = max(lat, max_lat)
+		max_long = max(lng, max_long)
+
+	return [min_long, min_lat, max_long, max_lat]
 
 def get_args():
 	""" Configure and fetch script args """
@@ -85,7 +115,7 @@ def get_args():
 		default="COLOUR"
 	)
 
-	return parser.parse_args()
+	return vars(parser.parse_args())
 
 if __name__ == "__main__":
-	fetch_data()
+	fetch_sentinel_data()
